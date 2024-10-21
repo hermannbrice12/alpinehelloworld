@@ -1,6 +1,21 @@
+
+image: docker:latest
+services:
+  - name: docker:dind 
+  - alias: docker
+
+stages:
+  - build
+  - Test acceptation
+
+
 docker-build:
-  image: docker:latest
-  services:
-    - docker:dind  # Un espace est requis après le tiret
+  stage: build 
   script:
     - docker build -t alpinehelloworld .
+
+test acceptation:
+  stage: Test acceptation
+  script:
+    - docker run -d -p 80:5000 -e PORT=5000 --name webapp alpinehelloworld
+    - curl "http://docker" | grep "hello world"
