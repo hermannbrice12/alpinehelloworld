@@ -62,11 +62,12 @@ deploy_staging:
   only:
     - master    
   script:
-    - echo "Deploying to AWS ECS Fargate (staging)..."
-    - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
-    - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
-    - aws configure set region $AWS_DEFAULT_REGION
-    - aws ecs run-task --cluster $ECS_CLUSTER --task-definition $ECS_TASK_DEFINITION --launch-type FARGATE --network-configuration "awsvpcConfiguration={subnets=[$ECS_SUBNET_1,$ECS_SUBNET_2],securityGroups=[$ECS_SECURITY_GROUP],assignPublicIp=ENABLED}" --count 1
+    - |
+      docker run --rm -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY -e AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION amazon/aws-cli:latest /bin/sh -c '
+        echo "Deploying to AWS ECS Fargate (staging)..."
+        aws configure set region $AWS_DEFAULT_REGION
+        aws ecs run-task --cluster $ECS_CLUSTER --task-definition $ECS_TASK_DEFINITION --launch-type FARGATE --network-configuration "awsvpcConfiguration={subnets=[$ECS_SUBNET_1,$ECS_SUBNET_2],securityGroups=[$ECS_SECURITY_GROUP],assignPublicIp=ENABLED}" --count 1
+      '
 
 deploy_prod:
   image: amazon/aws-cli:latest
@@ -77,8 +78,9 @@ deploy_prod:
   only:
     - master
   script:
-    - echo "Deploying to AWS ECS Fargate (production)..."
-    - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
-    - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
-    - aws configure set region $AWS_DEFAULT_REGION
-    - aws ecs run-task --cluster $ECS_CLUSTER --task-definition $ECS_TASK_DEFINITION --launch-type FARGATE --network-configuration "awsvpcConfiguration={subnets=[$ECS_SUBNET_1,$ECS_SUBNET_2],securityGroups=[$ECS_SECURITY_GROUP],assignPublicIp=ENABLED}" --count 1
+    - |
+      docker run --rm -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY -e AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION amazon/aws-cli:latest /bin/sh -c '
+        echo "Deploying to AWS ECS Fargate (production)..."
+        aws configure set region $AWS_DEFAULT_REGION
+        aws ecs run-task --cluster $ECS_CLUSTER --task-definition $ECS_TASK_DEFINITION --launch-type FARGATE --network-configuration "awsvpcConfiguration={subnets=[$ECS_SUBNET_1,$ECS_SUBNET_2],securityGroups=[$ECS_SECURITY_GROUP],assignPublicIp=ENABLED}" --count 1
+      '
