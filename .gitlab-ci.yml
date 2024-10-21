@@ -26,7 +26,7 @@ test_acceptation:
     - curl "http://docker" | grep "Hello world"  # Vérification avec curl dans le conteneur
 
 release image:
-  stage: - release_image
+  stage: release_image
   script:
     - docker load < alpinehelloworld.tar
     - docker tag alpinehelloworld "${IMAGE_NAME}:${CI_COMMIT_REF_NAME}"
