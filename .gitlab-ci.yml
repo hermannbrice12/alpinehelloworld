@@ -9,13 +9,6 @@ variables:
   INTERNAL_PORT: 5000
   EXTERNAL_PORT: 80
 
-# Utilisation de l'image AWS CLI pour les jobs liés au déploiement sur AWS
-image: amazon/aws-cli:latest
-
-services:
-  - name: docker:dind
-    alias: docker
-
 stages:
   - build
   - test_acceptation
@@ -24,7 +17,10 @@ stages:
   - deploy_prod
 
 docker-build:
+  image: docker:latest
   stage: build
+  services:
+    - docker:dind
   script:
     - docker build -t alpinehelloworld .
     - docker save alpinehelloworld > alpinehelloworld.tar
@@ -33,7 +29,10 @@ docker-build:
       - alpinehelloworld.tar
 
 test_acceptation:
+  image: docker:latest
   stage: test_acceptation
+  services:
+    - docker:dind
   script:
     - docker load < alpinehelloworld.tar
     - docker run -d -p 80:5000 -e PORT=5000 --name webapp alpinehelloworld
@@ -42,7 +41,10 @@ test_acceptation:
     - curl "http://docker" | grep "Hello world!"
 
 release_image:
+  image: docker:latest
   stage: release_image
+  services:
+    - docker:dind
   script:
     - docker load < alpinehelloworld.tar
     - docker tag alpinehelloworld "${IMAGE_NAME}:${CI_COMMIT_REF_NAME}"
@@ -52,6 +54,7 @@ release_image:
     - docker push "${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
 
 deploy_staging:
+  image: amazon/aws-cli:latest
   stage: deploy_staging
   environment:
     name: staging
@@ -63,14 +66,10 @@ deploy_staging:
     - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
     - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
     - aws configure set region $AWS_DEFAULT_REGION
-    - aws ecs run-task \
-        --cluster $ECS_CLUSTER \
-        --task-definition $ECS_TASK_DEFINITION \
-        --launch-type FARGATE \
-        --network-configuration "awsvpcConfiguration={subnets=[$ECS_SUBNET_1,$ECS_SUBNET_2],securityGroups=[$ECS_SECURITY_GROUP],assignPublicIp=ENABLED}" \
-        --count 1
+    - aws ecs run-task --cluster $ECS_CLUSTER --task-definition $ECS_TASK_DEFINITION --launch-type FARGATE --network-configuration "awsvpcConfiguration={subnets=[$ECS_SUBNET_1,$ECS_SUBNET_2],securityGroups=[$ECS_SECURITY_GROUP],assignPublicIp=ENABLED}" --count 1
 
 deploy_prod:
+  image: amazon/aws-cli:latest
   stage: deploy_prod
   environment:
     name: production
@@ -82,9 +81,4 @@ deploy_prod:
     - aws configure set aws_access_key_id $AWS_ACCESS_KEY_ID
     - aws configure set aws_secret_access_key $AWS_SECRET_ACCESS_KEY
     - aws configure set region $AWS_DEFAULT_REGION
-    - aws ecs run-task \
-        --cluster $ECS_CLUSTER \
-        --task-definition $ECS_TASK_DEFINITION \
-        --launch-type FARGATE \
-        --network-configuration "awsvpcConfiguration={subnets=[$ECS_SUBNET_1,$ECS_SUBNET_2],securityGroups=[$ECS_SECURITY_GROUP],assignPublicIp=ENABLED}" \
-        --count 1
+    - aws ecs run-task --cluster $ECS_CLUSTER --task-definition $ECS_TASK_DEFINITION --launch-type FARGATE --network-configuration "awsvpcConfiguration={subnets=[$ECS_SUBNET_1,$ECS_SUBNET_2],securityGroups=[$ECS_SECURITY_GROUP],assignPublicIp=ENABLED}" --count 1
