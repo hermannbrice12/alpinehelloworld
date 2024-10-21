@@ -1,0 +1,6 @@
+docker-build:
+    image: docker:latest
+    services:
+        -docker:dind
+    script:
+        -docker build -t alpinehelloworld .
