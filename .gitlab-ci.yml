@@ -25,7 +25,7 @@ test_acceptation:
     - sleep 5  # Attendre quelques secondes que le conteneur démarre correctement
     - curl "http://docker" | grep "Hello world"  # Vérification avec curl dans le conteneur
 
-release image:
+release_image:
   stage: release_image
   script:
     - docker load < alpinehelloworld.tar
