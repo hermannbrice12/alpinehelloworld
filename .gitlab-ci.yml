@@ -1,6 +1,6 @@
 docker-build:
-    image: docker:latest
-    services:
-        -docker:dind
-    script:
-        -docker build -t alpinehelloworld .
+  image: docker:latest
+  services:
+    - docker:dind  # Un espace est requis après le tiret
+  script:
+    - docker build -t alpinehelloworld .
