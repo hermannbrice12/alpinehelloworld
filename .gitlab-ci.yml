@@ -38,11 +38,12 @@ release_image:
   services:
     - docker:dind
   script:
-    - docker load < alpinehelloworld.tar
-    - docker tag alpinehelloworld "${IMAGE_NAME}:${CI_COMMIT_REF_NAME}"
-    - docker tag alpinehelloworld "${IMAGE_NAME}:${CI_COMMIT_SHORT_SHA}"
-    - echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
-    - docker push "docker.io/$DOCKER_USERNAME/alpinehelloworld:${CI_COMMIT_REF_NAME}"
-    - docker push "docker.io/$DOCKER_USERNAME/alpinehelloworld:${CI_COMMIT_SHORT_SHA}"
+    - docker load < alpinehelloworld.tar  # Charger l'image Docker sauvegardée
+    - docker images  # Vérifier les images Docker disponibles
+    - docker tag alpinehelloworld "docker.io/$DOCKER_USERNAME/alpinehelloworld:${CI_COMMIT_REF_NAME}"  # Taguer l'image
+    - docker tag alpinehelloworld "docker.io/$DOCKER_USERNAME/alpinehelloworld:${CI_COMMIT_SHORT_SHA}"  # Taguer l'image avec le hash du commit
+    - echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin  # Se connecter à DockerHub
+    - docker push "docker.io/$DOCKER_USERNAME/alpinehelloworld:${CI_COMMIT_REF_NAME}"  # Pousser l'image avec le tag de la branche
+    - docker push "docker.io/$DOCKER_USERNAME/alpinehelloworld:${CI_COMMIT_SHORT_SHA}"  # Pousser l'image avec le tag du commit
   only:
     - master
