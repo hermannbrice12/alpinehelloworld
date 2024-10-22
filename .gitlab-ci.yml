@@ -7,6 +7,7 @@ stages:
   - build
   - test_acceptation
   - release_image
+  - deploy
 
 docker-build:
   image: docker:latest
@@ -45,5 +46,17 @@ release_image:
     - echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin  # Se connecter à DockerHub
     - docker push "docker.io/$DOCKER_USERNAME/alpinehelloworld:${CI_COMMIT_REF_NAME}"  # Pousser l'image avec le tag de la branche
     - docker push "docker.io/$DOCKER_USERNAME/alpinehelloworld:${CI_COMMIT_SHORT_SHA}"  # Pousser l'image avec le tag du commit
+  only:
+    - master
+
+deploy_to_dockerhub:
+  image: docker:latest
+  stage: deploy
+  services:
+    - docker:dind
+  script:
+    - echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin  # Se connecter à DockerHub
+    - docker pull "docker.io/$DOCKER_USERNAME/alpinehelloworld:${CI_COMMIT_REF_NAME}"  # Récupérer l'image Docker depuis DockerHub
+    - docker run -d -p $EXTERNAL_PORT:$INTERNAL_PORT --name webapp "docker.io/$DOCKER_USERNAME/alpinehelloworld:${CI_COMMIT_REF_NAME}"  # Démarrer l'application depuis l'image téléchargée
   only:
     - master
