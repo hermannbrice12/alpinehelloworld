@@ -1,5 +1,5 @@
 variables:
-  IMAGE_NAME: "dockerhub_username/alpinehelloworld"  # Mettez à jour avec votre nom d'image DockerHub
+  IMAGE_NAME: "tchofo/alpinehelloworld" 
   INTERNAL_PORT: 5000
   EXTERNAL_PORT: 80
 
