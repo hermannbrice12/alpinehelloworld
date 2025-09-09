@@ -1,89 +1,100 @@
 pipeline {
-     environment {
-       IMAGE_NAME = "alpinehelloworld"
-       IMAGE_TAG = "latest"
-       STAGING = "eazytraining-staging"
-       PRODUCTION = "eazytraining-production"
-     }
-     agent none
-     stages {
-         stage('Build image') {
-             agent any
-             steps {
-                script {
-                  sh 'docker build -t eazytraining/$IMAGE_NAME:$IMAGE_TAG .'
-                }
-             }
-        }
-        stage('Run container based on builded image') {
-            agent any
+    agent any
+
+    environment {
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub-tchofo') // ID des credentials DockerHub dans Jenkins
+        ID_DOCKERHUB = "tchofo"
+        IMAGE_NAME = "alpinehelloworld"
+        IMAGE_TAG = "latest"
+        PORT_EXPOSED = 80
+        SLACK_CHANNEL = '#jenkins-builds' // ton channel Slack
+        SLACK_CREDENTIALS = credentials('slack-token') // ID du secret Slack configuré dans Jenkins
+    }
+
+    stages {
+        stage('Checkout') {
             steps {
-               script {
-                 sh '''
-                    docker run --name $IMAGE_NAME -d -p 80:5000 -e PORT=5000 eazytraining/$IMAGE_NAME:$IMAGE_TAG
-                    sleep 5
-                 '''
-               }
+                git branch: 'main', url: 'https://github.com/hermannbrice12/alpinehelloworld.git'
             }
-       }
-       stage('Test image') {
-           agent any
-           steps {
-              script {
-                sh '''
-                    curl http://localhost | grep -q "Hello world!"
-                '''
-              }
-           }
-      }
-      stage('Clean Container') {
-          agent any
-          steps {
-             script {
-               sh '''
-                 docker stop $IMAGE_NAME
-                 docker rm $IMAGE_NAME
-               '''
-             }
-          }
-     }
-     stage('Push image in staging and deploy it') {
-       when {
-              expression { GIT_BRANCH == 'origin/master' }
-            }
-      agent any
-      environment {
-          HEROKU_API_KEY = credentials('heroku_api_key')
-      }  
-      steps {
-          script {
-            sh '''
-              heroku container:login
-              heroku create $STAGING || echo "project already exist"
-              heroku container:push -a $STAGING web
-              heroku container:release -a $STAGING web
-            '''
-          }
         }
-     }
-     stage('Push image in production and deploy it') {
-       when {
-              expression { GIT_BRANCH == 'origin/master' }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    sh """
+                        docker build -t ${ID_DOCKERHUB}/${IMAGE_NAME}:${IMAGE_TAG} .
+                    """
+                }
             }
-      agent any
-      environment {
-          HEROKU_API_KEY = credentials('heroku_api_key')
-      }  
-      steps {
-          script {
-            sh '''
-              heroku container:login
-              heroku create $PRODUCTION || echo "project already exist"
-              heroku container:push -a $PRODUCTION web
-              heroku container:release -a $PRODUCTION web
-            '''
-          }
         }
-     }
-  }
+
+        stage('Run container based on built image') {
+            steps {
+                script {
+                    sh """
+                        docker run --name ${IMAGE_NAME} -d -p  ${PORT_EXPOSED}:5000 -e PORT=5000 ${ID_DOCKERHUB}/${IMAGE_NAME}:${IMAGE_TAG}
+                        sleep 5
+                    """
+                }
+            }
+        }
+
+        stage('Test image') {
+            steps {
+                script {
+                    sh """
+                        curl http://172.17.0.1:${PORT_EXPOSED} | grep -q "Hello world!"
+                    """
+                }
+            }
+        }
+
+        stage('Clean Container') {
+            steps {
+                script {
+                    sh """
+                        docker stop ${IMAGE_NAME}
+                        docker rm ${IMAGE_NAME}
+                    """
+                }
+            }
+        }
+
+        stage('Login to DockerHub') {
+            steps {
+                script {
+                    sh """
+                        echo "${DOCKERHUB_CREDENTIALS_PSW}" | docker login -u "${DOCKERHUB_CREDENTIALS_USR}" --password-stdin
+                    """
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    sh """
+                        docker push ${ID_DOCKERHUB}/${IMAGE_NAME}:${IMAGE_TAG}
+                    """
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            slackSend (
+                channel: "${SLACK_CHANNEL}",
+                color: "good",
+                message: "✅ Build & Push réussi pour l’image *${ID_DOCKERHUB}/${IMAGE_NAME}:${IMAGE_TAG}*"
+            )
+        }
+        failure {
+            slackSend (
+                channel: "${SLACK_CHANNEL}",
+                color: "danger",
+                message: "❌ Échec du pipeline pour l’image *${ID_DOCKERHUB}/${IMAGE_NAME}:${IMAGE_TAG}*"
+            )
+        }
+    }
 }
