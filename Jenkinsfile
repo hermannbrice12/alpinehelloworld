@@ -8,13 +8,13 @@ pipeline {
         IMAGE_TAG = "latest"
         PORT_EXPOSED = 80
         SLACK_CHANNEL = '#jenkins-builds' // ton channel Slack
-        SLACK_CREDENTIALS = credentials('slack-token') // ID du secret Slack configuré dans Jenkins
+        #SLACK_CREDENTIALS = credentials('slack-token') // ID du secret Slack configuré dans Jenkins
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/hermannbrice12/alpinehelloworld.git'
+                git branch: 'master', url: 'https://github.com/hermannbrice12/alpinehelloworld.git'
             }
         }
 
@@ -43,7 +43,7 @@ pipeline {
             steps {
                 script {
                     sh """
-                        curl http://172.17.0.1:${PORT_EXPOSED} | grep -q "Hello world!"
+                        curl http://localhost:${PORT_EXPOSED} | grep -q "Hello world!"
                     """
                 }
             }
