@@ -8,7 +8,7 @@ pipeline {
         IMAGE_TAG = "latest"
         PORT_EXPOSED = 80
         SLACK_CHANNEL = '#jenkins-builds' // ton channel Slack
-        #SLACK_CREDENTIALS = credentials('slack-token') // ID du secret Slack configuré dans Jenkins
+       
     }
 
     stages {
