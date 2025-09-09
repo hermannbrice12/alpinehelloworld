@@ -7,8 +7,8 @@ pipeline {
         IMAGE_NAME = "alpinehelloworld"
         IMAGE_TAG = "latest"
         PORT_EXPOSED = 80
+        NETWORK_NAME = "jenkins_jenkins-network"
         SLACK_CHANNEL = '#jenkins-builds' // ton channel Slack
-       
     }
 
     stages {
@@ -28,22 +28,31 @@ pipeline {
             }
         }
 
-        stage('Run container based on built image') {
+        stage('Run Container') {
             steps {
                 script {
                     sh """
-                        docker run --name ${IMAGE_NAME} -d -p  ${PORT_EXPOSED}:5000 -e PORT=5000 ${ID_DOCKERHUB}/${IMAGE_NAME}:${IMAGE_TAG}
+                        # Supprimer ancien conteneur s’il existe
+                        docker rm -f ${IMAGE_NAME} || true
+                        
+                        # Lancer le conteneur dans le même réseau que Jenkins
+                        docker run --name ${IMAGE_NAME} -d \
+                          --network ${NETWORK_NAME} \
+                          -p ${PORT_EXPOSED}:5000 \
+                          -e PORT=5000 \
+                          ${ID_DOCKERHUB}/${IMAGE_NAME}:${IMAGE_TAG}
+                        
                         sleep 5
                     """
                 }
             }
         }
 
-        stage('Test image') {
+        stage('Test from Jenkins') {
             steps {
                 script {
                     sh """
-                        curl http://alpinehelloworld:5000| grep -q "Hello world!"
+                        docker exec jenkins-launch curl -s http://${IMAGE_NAME}:5000 | grep -q "Hello world!"
                     """
                 }
             }
@@ -53,8 +62,8 @@ pipeline {
             steps {
                 script {
                     sh """
-                        docker stop ${IMAGE_NAME}
-                        docker rm ${IMAGE_NAME}
+                        docker stop ${IMAGE_NAME} || true
+                        docker rm ${IMAGE_NAME} || true
                     """
                 }
             }
