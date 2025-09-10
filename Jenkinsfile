@@ -7,7 +7,7 @@ pipeline {
         IMAGE_TAG = "latest"
         PORT_EXPOSED = 80
         // NETWORK_NAME = "jenkins_jenkins-network"
-        SLACK_CHANNEL = '#jenkins-builds' // ton channel Slack
+        SLACK_CHANNEL = '#jenkins-builds' //  channel Slack
     }
     stages {
         stage('Checkout') {
