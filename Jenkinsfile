@@ -52,7 +52,7 @@ pipeline {
             steps {
                 script {
                     sh """
-                        docker exec jenkins-launch curl -s http://${IMAGE_NAME}:80 | grep -q "Hello world!"
+                        docker exec jenkins-launch curl -s http://${IMAGE_NAME}:81 | grep -q "Hello world!"
                     """
                 }
             }
