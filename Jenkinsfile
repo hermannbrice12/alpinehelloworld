@@ -6,7 +6,7 @@ pipeline {
         ID_DOCKERHUB = "tchofo"
         IMAGE_NAME = "alpinehelloworld"
         IMAGE_TAG = "latest"
-        //PORT_EXPOSED = 80
+        PORT_EXPOSED = 80
       //  NETWORK_NAME = "jenkins_jenkins-network"
         SLACK_CHANNEL = '#jenkins-builds' // ton channel Slack
     }
@@ -86,20 +86,4 @@ pipeline {
         }
     }
 
-    post {
-        success {
-            slackSend (
-                channel: "${SLACK_CHANNEL}",
-                color: "good",
-                message: "✅ Build & Push réussi pour l’image *${ID_DOCKERHUB}/${IMAGE_NAME}:${IMAGE_TAG}*"
-            )
-        }
-        failure {
-            slackSend (
-                channel: "${SLACK_CHANNEL}",
-                color: "danger",
-                message: "❌ Échec du pipeline pour l’image *${ID_DOCKERHUB}/${IMAGE_NAME}:${IMAGE_TAG}*"
-            )
-        }
-    }
-}
+   
