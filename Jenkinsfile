@@ -1,23 +1,20 @@
 pipeline {
     agent any
-
     environment {
         DOCKERHUB_CREDENTIALS = credentials('dockerhub-tchofo') // ID des credentials DockerHub dans Jenkins
         ID_DOCKERHUB = "tchofo"
         IMAGE_NAME = "alpinehelloworld"
         IMAGE_TAG = "latest"
         PORT_EXPOSED = 80
-      //  NETWORK_NAME = "jenkins_jenkins-network"
+        // NETWORK_NAME = "jenkins_jenkins-network"
         SLACK_CHANNEL = '#jenkins-builds' // ton channel Slack
     }
-
     stages {
         stage('Checkout') {
             steps {
                 git branch: 'master', url: 'https://github.com/hermannbrice12/alpinehelloworld.git'
             }
         }
-
         stage('Build Docker Image') {
             steps {
                 script {
@@ -27,7 +24,6 @@ pipeline {
                 }
             }
         }
-
         stage('Run Container') {
             steps {
                 script {
@@ -43,7 +39,6 @@ pipeline {
                 }
             }
         }
-
         stage('Test from Jenkins') {
             steps {
                 script {
@@ -53,7 +48,6 @@ pipeline {
                 }
             }
         }
-
         stage('Clean Container') {
             steps {
                 script {
@@ -64,7 +58,6 @@ pipeline {
                 }
             }
         }
-
         stage('Login to DockerHub') {
             steps {
                 script {
@@ -74,7 +67,6 @@ pipeline {
                 }
             }
         }
-
         stage('Push Docker Image') {
             steps {
                 script {
@@ -84,6 +76,5 @@ pipeline {
                 }
             }
         }
-    
-
-   
+    }
+}
