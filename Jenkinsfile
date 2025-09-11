@@ -101,10 +101,10 @@ post {
 */
 
 post {
-    always {
-        script {
-            slackNotifier currentBuild.result
+        always {
+            script {
+                slackNotifier(currentBuild.result)
+            }
         }
     }
-}
 }
