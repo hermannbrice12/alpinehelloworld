@@ -1,2 +1,2 @@
 # alpinehelloworld
-![Build Status](http://192.168.236.171:8080/job/deploiement/badge/icon)](http://192.168.236.171:8080/job/deploiement/
+[![Build Status](https://abc123def456.ngrok.io/job/deploiement/statusbadges-build/icon)](https://abc123def456.ngrok.io/job/deploiement/)
