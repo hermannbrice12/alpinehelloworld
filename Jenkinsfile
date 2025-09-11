@@ -1,3 +1,7 @@
+/* import shared-library */
+@Library('shared-library')
+
+
 pipeline {
     agent any
     environment {
@@ -77,21 +81,30 @@ pipeline {
             }
         }
     }
-    post {
-        success {
-            slackSend (
-                channel: "${SLACK_CHANNEL}",
-                color: "good",
-                message: "✅ Build & Push réussi pour l’image *${ID_DOCKERHUB}/${IMAGE_NAME}:${IMAGE_TAG}*"
-            )
-        }
-        failure {
-            slackSend (
-                channel: "${SLACK_CHANNEL}",
-                color: "danger",
-                message: "❌ Échec du pipeline pour l’image *${ID_DOCKERHUB}/${IMAGE_NAME}:${IMAGE_TAG}*"
-            )
+  /*
+post {
+    success {
+        slackSend (
+            channel: "${SLACK_CHANNEL}",
+            color: "good",
+            message: "✅ Build & Push réussi pour l’image *${ID_DOCKERHUB}/${IMAGE_NAME}:${IMAGE_TAG}*"
+        )
+    }
+    failure {
+        slackSend (
+            channel: "${SLACK_CHANNEL}",
+            color: "danger",
+            message: "❌ Échec du pipeline pour l’image *${ID_DOCKERHUB}/${IMAGE_NAME}:${IMAGE_TAG}*"
+        )
+    }
+}
+*/
+
+post {
+    always {
+        script {
+            slackNotifier currentBuild.result
         }
     }
 }
-
+}
