@@ -1,2 +1,2 @@
 # alpinehelloworld
-[![Build Status](https://abc123def456.ngrok.io/job/deploiement/statusbadges-build/icon)](https://abc123def456.ngrok.io/job/deploiement/)
+[![Build Status](https://aff9b00c76fe.ngrok-free.app/job/deploiement/statusbadges-build/icon)](https://aff9b00c76fe.ngrok-free.app/job/deploiement/)
