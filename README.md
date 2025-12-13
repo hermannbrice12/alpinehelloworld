@@ -1,4 +1,2 @@
 # alpinehelloworld
-
-
-[![Build Status](http://ip10-0-0-3-bsu2msf734ug0cfcege0-8080.direct.docker.labs.eazytraining.fr/buildStatus/icon?job=deploiement)](http://ip10-0-0-3-bsu2msf734ug0cfcege0-8080.direct.docker.labs.eazytraining.fr/job/deploiement/)
+[![Build Status](https://aff9b00c76fe.ngrok-free.app/job/deploiement/statusbadges-build/icon)](https://aff9b00c76fe.ngrok-free.app/job/deploiement/)
