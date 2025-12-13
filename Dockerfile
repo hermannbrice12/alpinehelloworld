@@ -8,6 +8,9 @@ ENV PYTHONUNBUFFERED=1
 # Dépendances système
 RUN apk add --no-cache bash gcc musl-dev libffi-dev
 
+# ⚠️ UTILISER pip DU VENV (PAS pip3)
+RUN /opt/venv/bin/pip install --no-cache-dir -r /tmp/requirements.txt
+
 # Créer un virtualenv (PEP 668 compliant)
 RUN python -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
