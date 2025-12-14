@@ -47,7 +47,7 @@ pipeline {
             steps {
                 script {
                     sh """
-        PORT_EXPOSED = 8081
+        PORT_EXPOSED = 80
                         curl http://localhost | grep -q "Hello world!"
                     """
                 }
