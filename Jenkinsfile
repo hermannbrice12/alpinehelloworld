@@ -9,7 +9,7 @@ pipeline {
         ID_DOCKERHUB = "tchofo"
         IMAGE_NAME = "alpinehelloworld"
         IMAGE_TAG = "latest"
-        PORT_EXPOSED = 80
+        PORT_EXPOSED = 8081
         // NETWORK_NAME = "jenkins_jenkins-network"
         SLACK_CHANNEL = '#jenkins-builds' //  channel Slack
     }
