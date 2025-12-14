@@ -9,7 +9,7 @@ pipeline {
         ID_DOCKERHUB = "tchofo"
         IMAGE_NAME = "alpinehelloworld"
         IMAGE_TAG = "latest"
-        PORT_EXPOSED = 8081
+        PORT_EXPOSED = 80
         // NETWORK_NAME = "jenkins_jenkins-network"
         SLACK_CHANNEL = '#jenkins-builds' //  channel Slack
     }
@@ -48,7 +48,7 @@ pipeline {
                 script {
                     sh """
         PORT_EXPOSED = 8081
-                        curl http://localhost:8081 | grep -q "Hello world!"
+                        curl http://localhost | grep -q "Hello world!"
                     """
                 }
             }
