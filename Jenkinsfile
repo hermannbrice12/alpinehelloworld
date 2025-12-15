@@ -10,7 +10,9 @@ pipeline {
         IMAGE_NAME = "alpinehelloworld"
         IMAGE_TAG = "latest"
         PORT_EXPOSED = 80
-        // NETWORK_NAME = "jenkins_jenkins-network"
+        VM_HOST        = "ubuntu1"            
+        VM_USER        = "tchofo"
+        VM_SSH_CRED    = "ssh-tchofo-vm"
         SLACK_CHANNEL = '#jenkins-builds' //  channel Slack
     }
     stages {
@@ -82,6 +84,34 @@ pipeline {
             }
         }
     }
+
+
+       stage('Deploy to VM') {
+           steps {
+               script {
+                withCredentials([
+                    sshUserPrivateKey(
+                        credentialsId: VM_SSH_CRED,
+                        keyFileVariable: 'SSH_KEY',
+                        usernameVariable: 'SSH_USER'
+                    )
+                ]) {
+                    sh """
+                        ssh -o StrictHostKeyChecking=no -i "${SSH_KEY}" ${SSH_USER}@${VM_HOST} \\
+                          'docker pull ${ID_DOCKERHUB}/${IMAGE_NAME}:${IMAGE_TAG} && \\
+                           docker rm -f ${IMAGE_NAME} || true && \\
+                           docker run -d --name ${IMAGE_NAME} -p 80:5000 -e PORT=5000 ${ID_DOCKERHUB}/${IMAGE_NAME}:${IMAGE_TAG}'
+                    """
+                }
+            }
+        }
+    }
+
+
+
+
+
+
   /*
 post {
     success {
