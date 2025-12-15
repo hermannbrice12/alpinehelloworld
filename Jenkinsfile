@@ -98,9 +98,9 @@ pipeline {
                         sh """
                             
                               ssh -o StrictHostKeyChecking=no -i "$SSH_KEY" "$SSH_USER@ubuntu1" \
-                              'docker pull ${ID_DOCKERHUB}/${IMAGE_NAME}:${IMAGE_TAG} && \
-                               docker rm -f ${IMAGE_NAME} || true && \
-                               docker run -d --name ${IMAGE_NAME} -p 80:5000 -e PORT=5000 ${ID_DOCKERHUB}/${IMAGE_NAME}:${IMAGE_TAG}'
+                              docker pull '"$ID_DOCKERHUB"'/'"$IMAGE_NAME"':'"$IMAGE_TAG"' && \
+                               docker rm -f '"$IMAGE_NAME"' || true && \
+                               docker run -d --name '"$IMAGE_NAME"' -p 80:5000 -e PORT=5000 '"$ID_DOCKERHUB"'/'"$IMAGE_NAME"':'"$IMAGE_TAG"'
                         """
                     }
                 }
