@@ -89,11 +89,11 @@ pipeline {
             stage('Deploy to VM') {
                 steps {
                     script {
-                    withCredentials([
-                    sshUserPrivateKey(
-                        credentialsId: 'ssh-tchofo-vm',
-                        keyFileVariable: 'SSH_KEY',
-                        usernameVariable: 'SSH_USER'
+                       withCredentials([
+                           sshUserPrivateKey(
+                               credentialsId: 'ssh-tchofo-vm',
+                               keyFileVariable: 'SSH_KEY',
+                               usernameVariable: 'SSH_USER'
                     )
                 ]) {
                     sh """
