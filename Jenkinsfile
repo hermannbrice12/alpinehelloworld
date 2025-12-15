@@ -38,7 +38,7 @@ pipeline {
                     sh """
                         docker rm -f ${IMAGE_NAME} || true
                         docker run --name ${IMAGE_NAME} -d -p ${PORT_EXPOSED}:5000 -e PORT=5000 ${ID_DOCKERHUB}/${IMAGE_NAME}:${IMAGE_TAG}
-                        sleep 5
+                        sleep 10
                     """
                 }
             }
