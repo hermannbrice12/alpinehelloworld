@@ -86,29 +86,27 @@ pipeline {
     }
 
 
-       stage('Deploy to VM') {
-    steps {
-        script {
-            withCredentials([
-                sshUserPrivateKey(
-                    credentialsId: 'ssh-tchofo-vm',   // ou ton ID exact
-                    keyFileVariable: 'SSH_KEY',
-                    usernameVariable: 'SSH_USER'
-                )
-            ]) {
-                sh """
-                    ssh -o StrictHostKeyChecking=no -i "${SSH_KEY}" ${SSH_USER}@${VM_HOST} \\
-                      'docker pull ${ID_DOCKERHUB}/${IMAGE_NAME}:${IMAGE_TAG} && \\
-                       docker rm -f ${IMAGE_NAME} || true && \\
-                       docker run -d --name ${IMAGE_NAME} -p 80:5000 -e PORT=5000 ${ID_DOCKERHUB}/${IMAGE_NAME}:${IMAGE_TAG}'
-                """
+            stage('Deploy to VM') {
+        steps {
+            script {
+                withCredentials([
+                    sshUserPrivateKey(
+                        credentialsId: 'ssh-tchofo-vm',
+                        keyFileVariable: 'SSH_KEY',
+                        usernameVariable: 'SSH_USER'
+                    )
+                ]) {
+                    sh """
+                        ssh -o StrictHostKeyChecking=no -i "${SSH_KEY}" ${SSH_USER}@${VM_HOST} \\
+                          'docker pull ${ID_DOCKERHUB}/${IMAGE_NAME}:${IMAGE_TAG} && \\
+                           docker rm -f ${IMAGE_NAME} || true && \\
+                           docker run -d --name ${IMAGE_NAME} -p 80:5000 -e PORT=5000 ${ID_DOCKERHUB}/${IMAGE_NAME}:${IMAGE_TAG}'
+                    """
+                }
             }
         }
     }
-}
-
-}
-
+} 
 
 
   /*
