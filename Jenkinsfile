@@ -110,7 +110,7 @@ pipeline {
 
     post {
     success {
-        slackSend channel: '#jenkins-builds',
+        slackSend channel: '#jenkins-build',
                   color: 'good',
                   message: "✅ Build OK - ${env.JOB_NAME}"
     }
