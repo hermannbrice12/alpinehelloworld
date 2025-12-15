@@ -96,7 +96,7 @@ pipeline {
                         )
                     ]) {
                         sh """
-                            ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ${SSH_USER}@${VM_HOST} \\
+                            ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ${SSH_USER}@${VM_HOST}\\
                               'docker pull ${ID_DOCKERHUB}/${IMAGE_NAME}:${IMAGE_TAG} && \\
                                docker rm -f ${IMAGE_NAME} || true && \\
                                docker run -d --name ${IMAGE_NAME} -p 80:5000 -e PORT=5000 ${ID_DOCKERHUB}/${IMAGE_NAME}:${IMAGE_TAG}'
@@ -108,10 +108,15 @@ pipeline {
     }
 
     post {
-        always {
-            script {
-                slackNotifier(currentBuild.result)
-            }
-        }
+    success {
+        slackSend channel: '#jenkins-builds',
+                  color: 'good',
+                  message: "✅ Build OK - ${env.JOB_NAME}"
+    }
+    failure {
+        slackSend channel: '#jenkins-builds',
+                  color: 'danger',
+                  message: "❌ Build FAIL - ${env.JOB_NAME}"
     }
 }
+
