@@ -87,9 +87,9 @@ pipeline {
 
 
             stage('Deploy to VM') {
-        steps {
-            script {
-                withCredentials([
+                steps {
+                    script {
+                    withCredentials([
                     sshUserPrivateKey(
                         credentialsId: 'ssh-tchofo-vm',
                         keyFileVariable: 'SSH_KEY',
