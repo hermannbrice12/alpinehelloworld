@@ -84,7 +84,7 @@ pipeline {
                 )
             ]) {
                 def clean = env.NGROK_SSH_URL.replace('tcp://','')
-                def ngrok = env.NGROK_SSH_URL.split(':')
+                def ngrok  = clean.split(':')
                 def NGROK_HOST = ngrok[0]
                 def NGROK_PORT = ngrok[1]
 
