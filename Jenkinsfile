@@ -70,7 +70,8 @@ pipeline {
                 sh "docker push ${ID_DOCKERHUB}/${IMAGE_NAME}:${IMAGE_TAG}"
             }
         }
-stage('Deploy to VM via Ngrok') {
+        
+        stage('Deploy to VM via Ngrok') {
     steps {
         script {
 
@@ -119,5 +120,4 @@ stage('Deploy to VM via Ngrok') {
                       message: "❌ Build FAIL - ${env.JOB_NAME}"
         }
     }
-}
 }
