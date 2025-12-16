@@ -71,7 +71,7 @@ pipeline {
             }
         }
 
-        stage(stage('Deploy to VM via Ngrok') {
+        stage('Deploy to VM via Ngrok') {
     steps {
         script {
 
