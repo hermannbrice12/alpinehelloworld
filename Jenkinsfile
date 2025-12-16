@@ -71,47 +71,42 @@ pipeline {
             }
         }
 
-        stage('Deploy to VM via Ngrok') {
-            steps {
-                script {
+        stage(stage('Deploy to VM via Ngrok') {
+    steps {
+        script {
 
-                    withCredentials([
-                        string(credentialsId: 'NGROK_SSH_URL', variable: 'NGROK_SSH_URL'),
-                        usernamePassword(
-                            credentialsId: 'SSH_LOGIN',
-                            usernameVariable: 'SSH_USER',
-                            passwordVariable: 'SSH_PASSWORD'
-                        )
-                    ]) {
+            withCredentials([
+                string(credentialsId: 'NGROK_SSH_URL', variable: 'NGROK_SSH_URL'),
+                usernamePassword(
+                    credentialsId: 'SSH_LOGIN',
+                    usernameVariable: 'SSH_USER',
+                    passwordVariable: 'SSH_PASSWORD'
+                )
+            ]) {
 
-                        def ngrok = env.NGROK_SSH_URL.split(':')
-                        def NGROK_HOST = ngrok[0]
-                        def NGROK_PORT = ngrok[1]
+                def ngrok = env.NGROK_SSH_URL.split(':')
+                def NGROK_HOST = ngrok[0]
+                def NGROK_PORT = ngrok[1]
 
-                        sh """
-                            echo "🔧 Installation de sshpass si nécessaire..."
-                            if ! command -v sshpass >/dev/null 2>&1; then
-                                sudo apt update -y
-                                sudo apt install -y sshpass
-                            fi
+                sh """
+                    echo "🚀 Déploiement via Ngrok SSH (sans installation sshpass)"
 
-                            echo "🚀 Déploiement via Ngrok SSH..."
-                            sshpass -p "$SSH_PASSWORD" ssh \
-                              -o StrictHostKeyChecking=no \
-                              -o UserKnownHostsFile=/dev/null \
-                              -p ${NGROK_PORT} \
-                              ${SSH_USER}@${NGROK_HOST} \
-                              "docker pull ${ID_DOCKERHUB}/${IMAGE_NAME}:${IMAGE_TAG} && \
-                               docker rm -f ${IMAGE_NAME} || true && \
-                               docker run -d --name ${IMAGE_NAME} \
-                                 -p 80:5000 -e PORT=5000 \
-                                 ${ID_DOCKERHUB}/${IMAGE_NAME}:${IMAGE_TAG}"
-                        """
-                    }
-                }
+                    sshpass -p "$SSH_PASSWORD" ssh \
+                      -o StrictHostKeyChecking=no \
+                      -o UserKnownHostsFile=/dev/null \
+                      -p ${NGROK_PORT} \
+                      ${SSH_USER}@${NGROK_HOST} \
+                      "docker pull ${ID_DOCKERHUB}/${IMAGE_NAME}:${IMAGE_TAG} && \
+                       docker rm -f ${IMAGE_NAME} || true && \
+                       docker run -d --name ${IMAGE_NAME} \
+                         -p 80:5000 -e PORT=5000 \
+                         ${ID_DOCKERHUB}/${IMAGE_NAME}:${IMAGE_TAG}"
+                """
             }
         }
     }
+}
+
 
     post {
         success {
