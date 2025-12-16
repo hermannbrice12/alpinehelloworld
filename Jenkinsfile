@@ -70,8 +70,7 @@ pipeline {
                 sh "docker push ${ID_DOCKERHUB}/${IMAGE_NAME}:${IMAGE_TAG}"
             }
         }
-
-        stage('Deploy to VM via Ngrok') {
+stage('Deploy to VM via Ngrok') {
     steps {
         script {
 
@@ -89,7 +88,7 @@ pipeline {
                 def NGROK_PORT = ngrok[1]
 
                 sh """
-                    echo "🚀 Déploiement via Ngrok SSH (sans installation sshpass)"
+                    echo "🚀 Déploiement via Ngrok SSH"
 
                     sshpass -p "$SSH_PASSWORD" ssh \
                       -o StrictHostKeyChecking=no \
