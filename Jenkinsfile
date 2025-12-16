@@ -9,9 +9,9 @@ pipeline {
         IMAGE_NAME = "alpinehelloworld"
         IMAGE_TAG = "latest"
         PORT_EXPOSED = 80
-        VM_HOST      = "ubuntu1"
-        VM_USER      = "tchofo"
-        VM_SSH_CRED  = "ssh-tchofo-vm"
+        NGROK_HTTP_URL = credentials('NGROK_HTTP_URL')
+        NGROK_SSH_URL = credentials('NGROK_SSH_URL')
+        SSH_CREDENTIALS = credentials('SSH_LOGIN')
         SLACK_CHANNEL = '#jenkins-builds'
     }
 
@@ -85,28 +85,46 @@ pipeline {
             }
         }
 
-        stage('Deploy to VM') {
-            steps {
-                script {
-                    withCredentials([
-                        sshUserPrivateKey(
-                            credentialsId: 'ssh-tchofo-vm',
-                            keyFileVariable: 'SSH_KEY',
-                            usernameVariable: 'SSH_USER'
-                        )
-                    ]) {
-                        sh '''
-                            
-                              ssh -o StrictHostKeyChecking=no -i "$SSH_KEY" "$SSH_USER@ubuntu1" \
-                              "docker pull ${ID_DOCKERHUB}/${IMAGE_NAME}:${IMAGE_TAG} && \
-                               docker rm -f ${IMAGE_NAME} || true && \
-                               docker run -d --name ${IMAGE_NAME} -p 80:5000 -e PORT=5000 ${ID_DOCKERHUB}/${IMAGE_NAME}:${IMAGE_TAG}"
-                        '''
-                    }
-                }
+       stage('Deploy to VM via Ngrok') {
+    steps {
+        script {
+
+            // Extraire host et port depuis NGROK_SSH_URL (ex: 5.tcp.eu.ngrok.io:18001)
+            def ngrok = env.NGROK_SSH_URL.split(':')
+            def NGROK_HOST = ngrok[0]
+            def NGROK_PORT = ngrok[1]
+
+            withCredentials([
+                usernamePassword(
+                    credentialsId: 'SSH_LOGIN',
+                    usernameVariable: 'SSH_USER',
+                    passwordVariable: 'SSH_PASSWORD'
+                )
+            ]) {
+                sh """
+                    echo "🔧 Installation de sshpass si nécessaire..."
+                    if ! command -v sshpass >/dev/null 2>&1; then
+                        sudo apt update -y
+                        sudo apt install -y sshpass
+                    fi
+
+                    echo "🚀 Déploiement sur la VM via Ngrok SSH..."
+                    sshpass -p "$SSH_PASSWORD" ssh \
+                      -o StrictHostKeyChecking=no \
+                      -o UserKnownHostsFile=/dev/null \
+                      -p ${NGROK_PORT} \
+                      ${SSH_USER}@${NGROK_HOST} \
+                      "docker pull ${ID_DOCKERHUB}/${IMAGE_NAME}:${IMAGE_TAG} && \
+                       docker rm -f ${IMAGE_NAME} || true && \
+                       docker run -d --name ${IMAGE_NAME} \
+                       -p 80:5000 -e PORT=5000 \
+                       ${ID_DOCKERHUB}/${IMAGE_NAME}:${IMAGE_TAG}"
+                """
             }
         }
     }
+}
+
 
     post {
     success {
