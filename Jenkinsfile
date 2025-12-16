@@ -107,7 +107,7 @@ pipeline {
     }
 }
 
-
+}
     post {
         success {
             slackSend channel: '#jenkins-build',
