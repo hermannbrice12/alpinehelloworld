@@ -13,7 +13,7 @@ pipeline {
         PORT_EXPOSED = 80
         SLACK_CHANNEL = '#jenkins-builds'
     //crédentials pour se connecter a aws
-        EC2_HOST = "35.181.43.175"
+        EC2_HOST = "13.38.219.29"
         EC2_USER = "ubuntu"
     }
 
@@ -127,7 +127,7 @@ stage('Deploy to AWS EC2 via SSH') {
             steps {
                 sshagent(credentials: ['EC2_SSH_KEY']) {
                     sh """
-                        echo "🚀 Déploiement sur EC2 AWS"
+                        echo "Déploiement sur EC2 AWS"
 
                         ssh -o StrictHostKeyChecking=no \
                             ${EC2_USER}@${EC2_HOST} '
