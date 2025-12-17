@@ -146,16 +146,16 @@ stage('Deploy to AWS EC2 via SSH') {
 
 
 //Envoie une notification Slack selon que le pipeline réussisse ou échoue.
-    post {
-        success {
-            slackSend channel: '#jenkins-build',
-                      color: 'good',
-                      message: "✅ Build OK - ${env.JOB_NAME}"
-        }
-        failure {
-            slackSend channel: '#jenkins-builds',
-                      color: 'danger',
-                      message: "❌ Build FAIL - ${env.JOB_NAME}"
-        }
-    }
-}
+//     post {
+//         success {
+//             slackSend channel: '#jenkins-build',
+//                       color: 'good',
+//                       message: "✅ Build OK - ${env.JOB_NAME}"
+//         }
+//         failure {
+//             slackSend channel: '#jenkins-builds',
+//                       color: 'danger',
+//                       message: "❌ Build FAIL - ${env.JOB_NAME}"
+//         }
+//     }
+// }
